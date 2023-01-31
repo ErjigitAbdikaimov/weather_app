@@ -7,6 +7,16 @@ import 'package:weather_app/constant/app_text.dart';
 import 'package:weather_app/constant/app_text_style.dart';
 import 'package:weather_app/model/weather.dart';
 
+List<String> cities = [
+  'bishkek',
+  'osh',
+  'talas',
+  'narun',
+  'batken',
+  'jalal-abad',
+  'tokmok',
+];
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -62,10 +72,10 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<void> weatherName() async {
+  Future<void> weatherName([String? name]) async {
     final dio = Dio();
     // await Future.delayed(const Duration(seconds: 10));
-    final res = await dio.get(ApiConst.address);
+    final res = await dio.get(ApiConst.address(name ?? 'bishkek'));
 
     if (res.statusCode == 200) {
       weather = Weather(
@@ -181,6 +191,7 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
         return Container(
+          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           decoration: BoxDecoration(
             color: Color.fromARGB(255, 19, 15, 2),
             border: Border.all(color: AppColors.white),
@@ -190,19 +201,24 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           height: MediaQuery.of(context).size.height * 0.8,
-          color: Colors.black12,
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Text('Баткен'),
-                ElevatedButton(
-                  child: const Text('Close BottomSheet'),
-                  onPressed: () => Navigator.pop(context),
+          // color: Colors.black12,
+          child: ListView.builder(
+            itemCount: cities.length,
+            itemBuilder: (context, index) {
+              final city = cities[index];
+              return Card(
+                child: ListTile(
+                  onTap: () {
+                    setState(() {
+                      weather = null;
+                    });
+                    weatherName(city);
+                    Navigator.pop(context);
+                  },
+                  title: Text(city),
                 ),
-              ],
-            ),
+              );
+            },
           ),
         );
       },
